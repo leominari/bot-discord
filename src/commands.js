@@ -1,33 +1,92 @@
 const axios = require('axios');
+const moment = require('moment');
+moment.locale('pt-br');
+
+
+async function baterPonto(codigo, tipo, message) {
+    try {
+        axios.request({
+            url: 'https://schaffen.brschaffen-it.com/wsLaravel/public/api/rh/ponto',
+            method: "post",
+            headers: {
+                Cookie: "laravel_session=W3oYCd9yBtJVhg2xMDu9YZx6xt28voVdj96YLysO;" +
+                    "token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjMzMywiaXNzIjoiaHR0cHM6Ly9zY2hhZmZlbi5icnNjaGFmZmVuLWl0LmNvbS93c0xhcmF2ZWwvcHVibGljL2FwaS9sb2dpbiIsImlhdCI6MTYxNzgxMDMxNywiZXhwIjoxNjE3ODEzOTE3LCJuYmYiOjE2MTc4MTAzMTcsImp0aSI6InJWc3M2dE5NOVRKMm11Rk4ifQ.7mVl64Tfzqz_6TchmeraudRreek74qwt8HihIZchGkE;" +
+                    "PHPSESSID=fmospv6n1r2evpesh8as9al122;"
+            },
+            data: {
+                pnt_data: moment().format("DD/MM/YYYY kk:mm:ss"),
+                pnt_fk_usu_codigo: parseInt(codigo),
+                pnt_horario: moment().format("kk:mm:ss"),
+                pnt_operacao: tipo,
+            }
+        }).then(res => {
+            console.log(res.data);
+            message.reply(`${res.data.return.pnt_operacao ? 'entrada' : 'saída'} cadastrada com sucesso, ${moment(res.data.return.pnt_data).format("DD/MM/YYYY kk:mm:ss")}.`);
+            return true;
+        })
+    } catch (e) {
+        message.reply('parece que deu algum problema, tenta pelo site 🤘 \n https://schaffen.brschaffen-it.com/index.php?a=ponto&b=ponto');
+        return false;
+    }
+}
+
+
+async function ultimoPonto(codigo, message) {
+    try {
+        axios.request({
+            url: 'https://schaffen.brschaffen-it.com/wsLaravel/public/api/rh/ponto/' + codigo + '/ultimo',
+            method: "get",
+            headers: {
+                Cookie: "laravel_session=W3oYCd9yBtJVhg2xMDu9YZx6xt28voVdj96YLysO;" +
+                    "token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjMzMywiaXNzIjoiaHR0cHM6Ly9zY2hhZmZlbi5icnNjaGFmZmVuLWl0LmNvbS93c0xhcmF2ZWwvcHVibGljL2FwaS9sb2dpbiIsImlhdCI6MTYxNzgxMDMxNywiZXhwIjoxNjE3ODEzOTE3LCJuYmYiOjE2MTc4MTAzMTcsImp0aSI6InJWc3M2dE5NOVRKMm11Rk4ifQ.7mVl64Tfzqz_6TchmeraudRreek74qwt8HihIZchGkE;" +
+                    "PHPSESSID=fmospv6n1r2evpesh8as9al122;"
+            },
+        }).then(res => {
+            console.log(res.data.return[0]);
+            message.author.send(`Oi ${message.member.user.tag}, o último ponto foi de ${res.data.return[0].pnt_operacao ? '**entrada**' : '**saída**'} 😄`);
+            // message.reply(`${res.data.return.pnt_operacao ? 'entrada' : 'saída'} cadastrada com sucesso, ${res.data.return.pnt_data}.`);
+            return true;
+        })
+    } catch (e) {
+        message.reply('parece que deu algum problema, tenta pelo site 🤘 \n https://schaffen.brschaffen-it.com/index.php?a=ponto&b=ponto');
+        return false;
+    }
+}
 
 const parceiros = {
-    'ponto': async (message, client) => {
+    'psai': async (message, client) => {
         if (message.channel.name === 'ponto') {
             let args = message.content.slice(1).split(' ')
-            console.log(args);
-            try {
-
-                axios.request({
-                    url: 'https://schaffen.brschaffen-it.com/wsLaravel/public/api/rh/ponto/' + args[1] + '/ultimo',
-                    method: "get",
-                    headers: {
-                        Cookie: "laravel_session=zUKT735n6ToY9I0GDGmLsQk10pHsD7BFd8l0MIq2;token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjMzMywiaXNzIjoiaHR0cHM6Ly9zY2hhZmZlbi5icnNjaGFmZmVuLWl0LmNvbS93c0xhcmF2ZWwvcHVibGljL2FwaS9sb2dpbiIsImlhdCI6MTYxNzczNDQ3MiwiZXhwIjoxNjE3NzM4MDcyLCJuYmYiOjE2MTc3MzQ0NzIsImp0aSI6ImhFTnZDTktOOThtY2NNZGQifQ.pcm6mxYZI1Kr5m1DoGLeXaYX5JYwEtNbCUmIIXtesmU;PHPSESSID=qlag873vhr8hi67ofvra440fe1;"
-                    }
-                }).then(res => {
-                    const ultima_operacao = res.data.return[0].pnt_operacao;
-                    console.log(new Date());
-                    // axios.post('https://schaffen.brschaffen-it.com/wsLaravel/public/api/rh/ponto', {
-                    //     pnt_data: "06/04/2021 18:32:12",
-                    //     pnt_fk_usu_codigo: 196,
-                    //     pnt_horario: "18:32:12",
-                    //     pnt_operacao: ultima_operacao ? 0 : 1,
-                    // }).then(res => {
-                    //     console.log(res);
-                    // })
-                })
-            } catch (e) {
-                console.log(e);
+            if (args.length < 2) {
+                message.reply('acho que faltou o código 😶');
+                return;
             }
+            await baterPonto(args[1], 0, message);
+        } else {
+            message.reply('sala errada 😴');
+        }
+    },
+    'pent': async (message, client) => {
+        if (message.channel.name === 'ponto') {
+            let args = message.content.slice(1).split(' ')
+            if (args.length < 2) {
+                message.reply('acho que faltou o código 😶');
+                return;
+            }
+            await baterPonto(args[1], 1, message);
+        } else {
+            message.reply('sala errada 😴');
+        }
+    },
+    'pult': async (message, client) => {
+        if (message.channel.name === 'ponto') {
+            let args = message.content.slice(1).split(' ')
+
+            if (args.length < 2) {
+                message.reply('acho que faltou o código 😶');
+                return;
+            }
+            await ultimoPonto(args[1], message);
         } else {
             message.reply('sala errada 😴');
         }
