@@ -15,7 +15,7 @@ const parceiros = {
                 message.reply('acho que faltou o código 😶');
                 return;
             }
-            baterPonto('saida', )
+            baterPonto('saida', 196);
             // await baterPonto(args[1], 0, message);
         } else {
             message.reply('sala errada 😴');
