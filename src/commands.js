@@ -1,53 +1,41 @@
 const Axios = require('axios');
 const moment = require('moment');
-const config = require('../../config.json');
+const config = require('../config.json');
 
 moment.locale('pt-br');
 
-const { baterPonto } = require('./classes/Ponto');
-
 const parceiros = {
 
-    'psai': async (message, client) => {
+    'ponto': async (message, client) => {
         if (message.channel.name === 'ponto') {
             let args = message.content.slice(1).split(' ')
+            let data = moment().format("DD/MM/YYYY kk:mm:ss");
+            let hora = moment().format("kk:mm:ss");
+            let res = '';
             if (args.length < 2) {
                 message.reply('acho que faltou o código 😶');
                 return;
             }
-            baterPonto('saida', 196);
-            // await baterPonto(args[1], 0, message);
+
+            Axios.post(config.BASE_URL + '/integracao/discord/bater_ponto', {
+                "pnt_data": data,
+                "pnt_fk_usu_codigo": args[1],
+                "pnt_horario": hora,
+            }, { headers: { Authorization: `Bearer ${config.TOKEN}` } }).then(res => {
+
+                if(res.data.return.pnt_operacao === 1){
+                    msg = 'bem vindo(a) 🤙';
+                }else{
+                    msg = 'tchau 👋';
+                }
+                message.reply(msg);
+            });
+
         } else {
             message.reply('sala errada 😴');
         }
     },
 
-    'pent': async (message, client) => {
-        if (message.channel.name === 'ponto') {
-            let args = message.content.slice(1).split(' ')
-            if (args.length < 2) {
-                message.reply('acho que faltou o código 😶');
-                return;
-            }
-            await baterPonto(args[1], 1, message);
-        } else {
-            message.reply('sala errada 😴');
-        }
-    },
-
-    'pult': async (message, client) => {
-        if (message.channel.name === 'ponto') {
-            let args = message.content.slice(1).split(' ')
-
-            if (args.length < 2) {
-                message.reply('acho que faltou o código 😶');
-                return;
-            }
-            await ultimoPonto(args[1], message);
-        } else {
-            message.reply('sala errada 😴');
-        }
-    },
     // 'review': async (message, client) => {
     //     if (message.channel.name === 'reviews-back') {
     //         await message.guild.members.fetch();

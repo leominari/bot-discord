@@ -9,9 +9,7 @@ const commands = {
     ...com.utils,
     'ajuda': (message, client) => {
         message.channel.send(`Os comandos do bot são:
-        !pent 00 - Bate ponto de entrada
-        !psai 00 - Bate ponto de saida
-        !pult 00 - Consulta ultima operação de ponto realizada`);
+        !ponto 00 - Bate ponto`);
     },
 }
 
