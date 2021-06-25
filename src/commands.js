@@ -3,7 +3,7 @@ const moment = require('moment');
 const config = require('../config.json');
 
 moment.locale('pt-br');
-
+// teste 123
 const parceiros = {
 
     'ponto': async (message, client) => {
