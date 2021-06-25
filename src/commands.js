@@ -4,6 +4,7 @@ const config = require('../config.json');
 
 moment.locale('pt-br');
 // teste 123
+// teste 321
 const parceiros = {
 
     'ponto': async (message, client) => {
